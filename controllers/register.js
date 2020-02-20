@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
         if (check) {
             res
                 .status(401)
-                .send({ status: false, message: "The email is ready to login" });
+                .send({ status: false, message: "The Email Already Exists" });
         } else {
             const regUser = await User.create({
                 email,
