@@ -1,13 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const { auth } = require("../middleware/auth");
 
 const { login } = require("../controllers/login");
 const { register } = require("../controllers/register");
-const  species  = require("../controllers/species");
 
-
-
-// const { auth } = require("../middleware/auth");
+const SpeciesCon = require("../controllers/species");
+const PetCon = require("../controllers/pet");
 
 router.get("/", (req, res) => {
   res.send("<strong>Hello DumbWays Rumah Tengah</strong>");
@@ -16,7 +15,12 @@ router.get("/", (req, res) => {
 router.post("/login", login);
 router.post("/register", register);
 
-router.post("/species", species.addSpecies);
-router.get("/species", species.showAllSpecies);
+router.post("/species", SpeciesCon.addSpecies);
+router.get("/species", SpeciesCon.showAllSpecies);
+
+router.get("/pets/", PetCon.indexPet);
+router.post("/pet/", PetCon.addPet);
+router.put("/pet/:id", auth, PetCon.updatePet);
+router.delete("/pet/:id", auth, PetCon.deletePet);
 
 module.exports = router;

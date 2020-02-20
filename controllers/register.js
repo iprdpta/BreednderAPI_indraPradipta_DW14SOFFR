@@ -7,7 +7,7 @@ exports.register = async (req, res) => {
     try {
         const { breeder, email, password, phone, address, pet } = req.body;
         const { name, gender } = pet;
-        const species = pet.species.id;
+        const species = pet.spesies.id;
         const age = pet.age.id;
 
         const check = await User.findOne({ where: { email } });

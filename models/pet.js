@@ -13,15 +13,15 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     pet.belongsTo(models.age, {
       foreignKey: "age_id",
-      sourceKey: "id"
+      as: "age"
     });
     pet.belongsTo(models.species, {
       foreignKey: "species_id",
-      sourceKey: "id"
+      as: "species"
     });
     pet.belongsTo(models.user, {
       foreignKey: "user_id",
-      sourceKey: "id"
+      as: "user"
     });
   };
   return pet;
