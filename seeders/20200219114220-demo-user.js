@@ -11,7 +11,6 @@ module.exports = {
           breeder: "Spiderman",
           phone: "083896831233",
           address: "permata bintaro residence",
-          pet_id: 1,
           createdAt: new Date(),
           updatedAt: new Date()
         },
@@ -21,7 +20,6 @@ module.exports = {
           breeder: "IP",
           phone: "0869696969",
           address: "Jalan jalan",
-          pet_id: 2,
           createdAt: new Date(),
           updatedAt: new Date()
         }
