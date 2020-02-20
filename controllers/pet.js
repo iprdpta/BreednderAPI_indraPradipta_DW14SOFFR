@@ -137,7 +137,35 @@ exports.deletePet = async (req, res) => {
     const petx = await Pet.findOne({ where: { id } });
     const pet = await Pet.destroy({ where: { id } });
     const idpet = petx.name;
-    res.status(200).send({ message: `Your Pet ${idpet} Has Been Deleted` });
+    res.status(200).send({ message: `Your Pet ${idpet} Has Been Deleted`});
+    console.log(err);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.detailPet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const detail = await Pet.findOne({
+      include: [
+        {
+          model: Species,
+          as: "species",
+          attributes: ["id", "name"]
+        },
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "breeder", "address", "phone"]
+        }
+      ],
+      attributes: { exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"] } ,
+      where: { id }
+    });
+
+    const idpet = detail.name;
+    res.status(200).send({ message: `Your Pet ${idpet}`, Detail : detail });
     console.log(err);
   } catch (err) {
     console.log(err);

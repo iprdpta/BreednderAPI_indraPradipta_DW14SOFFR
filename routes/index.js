@@ -22,5 +22,6 @@ router.get("/pets/", PetCon.indexPet);
 router.post("/pet/", PetCon.addPet);
 router.put("/pet/:id", auth, PetCon.updatePet);
 router.delete("/pet/:id", auth, PetCon.deletePet);
+router.get("/pet/:id", auth, PetCon.detailPet);
 
 module.exports = router;
