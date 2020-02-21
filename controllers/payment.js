@@ -8,7 +8,6 @@ exports.addPayment = async (req, res) => {
 
   const token = req.header("Authorization").replace("Bearer ", "");
   const user = jwt.verify(token, process.env.SECRET_KEY);
-  const userx = await User.findOne({ where: { id : user.user_id}})
 
   try {
     const payment = await Payment.create({
