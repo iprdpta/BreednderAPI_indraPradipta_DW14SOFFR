@@ -5,7 +5,6 @@ const User = models.user;
 const Species = models.species;
 
 exports.checkMatch = async (req, res) => {
-//   const { pet_id, pet_id_liked } = req.query;
   const { pet_id, pet_id_liked } = req.params;
   try {
     const data = await Match.findOne({ where: { pet_id, pet_id_liked } });
@@ -194,7 +193,6 @@ exports.updateMatch = async (req, res) => {
 };
 
 exports.detailMatch = async (req, res) => {
-  // const { pet_id, status } = req.query;
   try {
     const data = await Match.findAll({
       include: [
@@ -247,7 +245,6 @@ exports.detailMatch = async (req, res) => {
         }
       ],
       attributes: { exclude: ["createdAt", "UpdatedAt"] },
-      // where: { pet_id, status }
     });
 
     res.status(200).send({
