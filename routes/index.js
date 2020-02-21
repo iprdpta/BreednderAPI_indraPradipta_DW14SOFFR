@@ -36,4 +36,7 @@ router.post("/match", auth, MatchCon.createMatch);
 router.patch("/match/:id", auth, MatchCon.updateMatch);
 router.get("/matches", auth, MatchCon.detailMatch);
 
+router.post("/payment/", auth, PaymenCon.addPayment);
+router.put("/payment/:id", auth, PaymenCon.updatePayment);
+
 module.exports = router;

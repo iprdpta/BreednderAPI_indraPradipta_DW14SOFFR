@@ -23,6 +23,12 @@ module.exports = {
       address: {
         type: Sequelize.STRING
       },
+      pet_id: {
+        type: Sequelize.INTEGER
+      },
+      level: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

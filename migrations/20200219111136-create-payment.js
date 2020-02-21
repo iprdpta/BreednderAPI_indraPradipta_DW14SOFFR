@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       no_rek: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       proof_of_transfer: {
         type: Sequelize.STRING
