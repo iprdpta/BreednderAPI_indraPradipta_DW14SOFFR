@@ -22,6 +22,15 @@ module.exports = {
           address: "Jalan jalan",
           createdAt: new Date(),
           updatedAt: new Date()
+        },
+        {
+          email: "batman@gmail.com",
+          password: "bat",
+          breeder: "Batman",
+          phone: "0869696969",
+          address: "Gotham",
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ],
       {}

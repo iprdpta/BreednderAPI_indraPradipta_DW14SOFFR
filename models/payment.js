@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   payment.associate = function(models) {
     // associations can be defined here
+    payment.belongsTo(models.user, {
+      foreignKey: "users_id",
+      as: "user"
+    });
   };
   return payment;
 };
