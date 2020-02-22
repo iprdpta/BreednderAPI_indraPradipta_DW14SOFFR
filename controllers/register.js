@@ -7,21 +7,22 @@ exports.register = async (req, res) => {
     try {
         const { breeder, email, password, phone, address, pet } = req.body;
         const { name, gender } = pet;
-        const species = pet.spesies.id;
-        const age = pet.age.id;
+        const species = pet.spesies;
+        const age = pet.age;
 
         const check = await User.findOne({ where: { email } });
         if (check) {
             res
                 .status(401)
-                .send({ status: false, message: "The Email Already Exists" });
+                .send({ status: false, message: "Email Already Exists" });
         } else {
             const regUser = await User.create({
                 email,
                 password,
                 breeder,
                 phone,
-                address
+                address,
+                level : 0
             });
 
             const user = regUser.dataValues.id;

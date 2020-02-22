@@ -1,4 +1,5 @@
 const models = require("../models");
+const jwt = require("jsonwebtoken");
 
 const Pet = models.pet;
 const User = models.user;
@@ -7,9 +8,11 @@ const Age = models.age;
 
 exports.addPet = async (req, res) => {
   const { name, gender, age, about_pet, photo } = req.body;
-  const species = req.body.spesies.id;
-  const user = req.body.user.id;
+  const species = req.body.spesies;
   const ages = await Age.findOne({ where: { name: age } });
+
+  const token = req.header("Authorization").replace("Bearer ", "");
+  const user = jwt.verify(token, process.env.SECRET_KEY);
 
   const ageid = ages.id;
   try {
@@ -18,7 +21,7 @@ exports.addPet = async (req, res) => {
       gender,
       species_id: species,
       age_id: ageid,
-      user_id: user,
+      user_id: user.user_id,
       about_pet,
       photo
     });
@@ -46,7 +49,7 @@ exports.addPet = async (req, res) => {
     });
     res.status(200).send({
       status: true,
-      message: "Success Add Your New pet",
+      message: "Success Add Your pet",
       data
     });
   } catch (err) {
@@ -80,8 +83,7 @@ exports.indexPet = async (req, res) => {
 exports.updatePet = async (req, res) => {
   const id_data = req.params.id;
   const { name, gender, age, about_pet, photo } = req.body;
-  const species = req.body.spesies.id;
-  const user = req.body.user.id;
+  const species = req.body.spesies;
 
   const ages = await Age.findOne({ where: { name: age } });
 
@@ -95,16 +97,12 @@ exports.updatePet = async (req, res) => {
         gender,
         species,
         age_id : ageid,
-        user,
         about_pet,
         photo
       },
       { where: { id: id_data } }
     );
     const id = req.params.id;
-    console.log(
-      `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ${id}`
-    );
     const data = await Pet.findOne({
       include: [
         {

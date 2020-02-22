@@ -31,10 +31,9 @@ router.get("/user/:id", auth, UserCon.detailUser);
 router.put("/user/:id", auth, UserCon.updateUser);
 router.delete("/user/:id", auth, UserCon.deleteUser)
 
-router.get("/match/pet_id/:pet_id/pet_id_liked/:pet_id_liked", auth, MatchCon.checkMatch);
-router.post("/match", auth, MatchCon.createMatch);
-router.patch("/match/:id", auth, MatchCon.updateMatch);
-router.get("/matches", auth, MatchCon.detailMatch);
+router.post("/match", auth, MatchCon.create);
+router.get("/match", auth, MatchCon.check);
+router.put("/match/:id", auth, MatchCon.update);
 
 router.post("/payment/", auth, PaymenCon.addPayment);
 router.put("/payment/:id", auth, PaymenCon.updatePayment);

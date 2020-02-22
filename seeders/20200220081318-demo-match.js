@@ -8,42 +8,7 @@ module.exports = {
         {
           pet_id: 1,
           pet_id_liked: 3,
-          status: 1,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          pet_id: 3,
-          pet_id_liked: 1,
-          status: 1,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          pet_id: 2,
-          pet_id_liked: 4,
-          status: 0,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          pet_id: 3,
-          pet_id_liked: 2,
-          status: 0,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          pet_id: 2,
-          pet_id_liked: 3,
-          status: 0,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          pet_id: 1,
-          pet_id_liked: 2,
-          status: 0,
+          status: false,
           createdAt: new Date(),
           updatedAt: new Date()
         }

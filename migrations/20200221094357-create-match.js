@@ -9,10 +9,10 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       pet_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       pet_id_liked: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       status: {
         type: Sequelize.BOOLEAN

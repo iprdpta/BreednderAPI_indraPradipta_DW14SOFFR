@@ -1,5 +1,6 @@
 const models = require("../models");
 const User = models.user;
+const Pet = models.pet;
 
 exports.detailUser = async (req, res) => {
   try {
@@ -34,7 +35,7 @@ exports.updateUser = async (req, res) => {
     const data = await User.findOne({where: { id: id_data }});
     res.status(200).send({
       status: true,
-      message: "Success Update your pet",
+      message: "Your Acoount Has Been Updated",
       data: data
     });
   } catch (err) {
@@ -48,7 +49,10 @@ exports.deleteUser = async (req, res) => {
       const usx = await User.findOne({ where: { id } });
       const deleteuser = await User.destroy({ where: { id } });
       const iduser = usx.breeder;
-      res.status(200).send({ message: `Your Account ${iduser} Has Been Deleted`});
+
+      const pet = await Pet.findAll ({ where: {user_id : id}})
+      const deletepet = await Pet.destroy({ where: {user_id : id}})
+      res.status(200).send({ message: `Your Account ${iduser} Has Been Deleted`, pet});
       console.log(err);
     } catch (err) {
       console.log(err);

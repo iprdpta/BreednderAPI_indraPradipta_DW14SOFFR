@@ -23,6 +23,17 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "user_id",
       as: "user"
     });
+
+    pet.belongsToMany(pet, {
+      through: models.match,
+      as: "pet_id",
+      foreignKey: "pet_id"
+    });
+    pet.belongsToMany(pet, {
+      through: models.match,
+      as: "pet_id_liked",
+      foreignKey: "pet_id_liked"
+    });
   };
   return pet;
 };

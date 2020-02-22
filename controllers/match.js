@@ -1,257 +1,99 @@
 const models = require("../models");
-const Match = models.match;
+const { checkMatch, checkAlreadyLiked, checkMatchx } = require("../middleware/match");
+
 const Pet = models.pet;
 const User = models.user;
 const Species = models.species;
+const Age = models.age;
+const Match = models.match;
 
-exports.checkMatch = async (req, res) => {
-  const { pet_id, pet_id_liked } = req.params;
+
+exports.check = async (req, res) => {
   try {
-    const data = await Match.findOne({ where: { pet_id, pet_id_liked } });
-    if (data) {
-      const pet = await Pet.findOne({
-        include: [
-          {
-            model: User,
-            as: "user",
-            attributes: ["id", "breeder", "address", "phone"]
-          },
-          {
-            model: Species,
-            as: "species",
-            attributes: ["id", "name"]
-          }
-        ],
-        attributes: { exclude: ["user_id", "species_id", "createdAt", "updatedAt"] },
-        where: { id: pet_id }
+    const { pet_id, pet_id_liked } = req.query;
+    const isMatch = await checkMatch(pet_id, pet_id_liked);
+    if (isMatch.length > 0) {
+      const data = await Match.findOne({
+        where: { pet_id: isMatch[0], pet_id_liked: isMatch[1] }
       });
-
-      const pet_liked = await Pet.findOne({
-        include: [
-          {
-            model: User,
-            as: "user",
-            attributes: ["id", "breeder", "address", "phone"]
-          },
-          {
-            model: Species,
-            as: "species",
-            attributes: ["id", "name"]
-          }
-        ],
-        attributes: { exclude: ["user_id", "species_id", "createdAt", "updatedAt"] },
-        where: { id: pet_id_liked }
-      });
-
-      res.status(200).send({
-        status: true,
-        message: "Pet Matched",
-        data: {
-          id: data.id,
-          status: data.status,
-          pet,
-          pet_liked,
-          createAt: data.createdAt,
-          updateAt: data.updatedAt
-        }
-      });
+      res.status(200).send(data);
     } else {
-      res.status(204).send({
-        
-        message: "Matched not found"
-      });
+      res.send("Match Not Found");
+    }
+  } catch (err) {}
+};
+
+exports.create = async (req, res) => {
+  try {
+    const { pet_id, pet_id_liked } = req.body;
+    const isMatch = await checkMatchx(pet_id, pet_id_liked);
+    if (isMatch.length > 0) {
+      const isAlreadyLiked = await checkAlreadyLiked(pet_id, pet_id_liked);
+      res.send("Already Matched");
+    } else {
+      const isAlreadyLiked = await checkAlreadyLiked(pet_id, pet_id_liked);
+      if (isAlreadyLiked) {
+        console.log("update");
+        const pet = await Match.update(
+          {
+            status: true,
+            updatedAt: new Date()
+          },
+          {
+            where: { pet_id: pet_id_liked, pet_id_liked: pet_id }
+          }
+        );
+        const data = await Match.findOne({
+          where: { pet_id: pet_id_liked, pet_id_liked: pet_id }
+        });
+        res.status(200).send(data);
+      } else {
+        const check = await Match.findOne({
+          where: {
+            pet_id,
+            pet_id_liked
+          }
+        });
+        if (!check) {
+          const match = await Match.create({
+            pet_id,
+            pet_id_liked,
+            status: "false",
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+          const data = await Match.findOne({
+            where: { pet_id, pet_id_liked }
+          });
+          res.status(200).send(data);
+        }
+        res.send("");
+      }
     }
   } catch (err) {
     console.log(err);
   }
 };
 
-exports.createMatch = async (req, res) => {
+exports.update = async (req, res) => {
   try {
-    const data = await Match.create(req.body);
-
-    if (data) {
-      const pet = await Pet.findOne({
-        include: [
-          {
-            model: User,
-            as: "user",
-            attributes: ["id", "breeder", "address", "phone"]
-          },
-          {
-            model: Species,
-            as: "species",
-            attributes: ["id", "name"]
-          }
-        ],
-        attributes: { exclude: ["user_id", "species_id", "createdAt", "updatedAt"] },
-        where: { id: data.pet_id }
-      });
-
-      const pet_liked = await Pet.findOne({
-        include: [
-          {
-            model: User,
-            as: "user",
-            attributes: ["id", "breeder", "address", "phone"]
-          },
-          {
-            model: Species,
-            as: "species",
-            attributes: ["id", "name"]
-          }
-        ],
-        attributes: { exclude: ["user_id", "species_id", "createdAt", "updatedAt"] },
-        where: { id: data.pet_id_liked }
-      });
-
-      res.status(200).send({
-        status: true,
-        message: "Pet Matched",
-        data: {
-          id: data.id,
-          status: data.status,
-          pet,
-          pet_liked,
-          createAt: data.createdAt,
-          updateAt: data.updatedAt
-        }
-      });
-    } else {
-      res.status(204).send({
-        status: false,
-        message: "Pet Already Matched"
-      });
-    }
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-exports.updateMatch = async (req, res) => {
-  try {
-    const { id } = req.params;
     const { pet_id, pet_id_liked, status } = req.body;
+    const { id } = req.params;
     const match = await Match.update(
-      { pet_id, pet_id_liked, status },
-      { where: { id } }
+      {
+        pet_id,
+        pet_id_liked,
+        status,
+        updatedAt: new Date()
+      },
+      {
+        where: { id }
+      }
     );
-
-    const find = await Match.findOne({
-      attributes: { exclude: ["createdAt", "UpdatedAt"] },
+    const data = await Match.findOne({
       where: { id }
     });
-    const pet = await Pet.findOne({
-      include: [
-        {
-          model: User,
-          as: "user",
-          attributes: ["id", "breeder", "address", "phone"]
-        },
-        {
-          model: Species,
-          as: "species",
-          attributes: ["id", "name"]
-        }
-      ],
-      attributes: { exclude: ["user_id", "species_id", "createdAt", "updatedAt"] },
-      where: { id: find.pet_id }
-    });
-
-    const pet_liked = await Pet.findOne({
-      include: [
-        {
-          model: User,
-          as: "user",
-          attributes: ["id", "breeder", "address", "phone"]
-        },
-        {
-          model: Species,
-          as: "species",
-          attributes: ["id", "name"]
-        }
-      ],
-      attributes: { exclude: ["user_id", "species_id", "createdAt", "updatedAt"] },
-      where: { id: find.pet_id_liked }
-    });
-
-    res.status(200).send({
-      status: true,
-      message: "Pet Matched Updated",
-      data: {
-        id: find.id,
-        status: find.status,
-        pet,
-        pet_liked,
-        createAt: find.createdAt,
-        updateAt: find.updatedAt
-      }
-    });
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-exports.detailMatch = async (req, res) => {
-  try {
-    const data = await Match.findAll({
-      include: [
-        {
-          model: Pet,
-          as: "pet",
-          include: [
-            {
-              model: Species,
-              as: "species",
-              attributes: ["id", "name"]
-            },
-            {
-              model: User,
-              as: "user",
-              attributes: ["id", "breeder", "address", "phone"]
-            }
-            
-          ],
-          attributes: [
-            "id",
-            "name",
-            "gender",
-            "about_pet",
-            "photo"
-          ]
-        },
-        {
-          model: Pet,
-          as: "pet_liked",
-          include: [
-            {
-              model: Species,
-              as: "species",
-              attributes: ["id", "name"]
-            },
-            {
-              model: User,
-              as: "user",
-              attributes: ["id", "breeder", "address", "phone"]
-            }            
-          ],
-          attributes: [
-            "id",
-            "name",
-            "gender",
-            "about_pet",
-            "photo"
-          ]
-        }
-      ],
-      attributes: { exclude: ["createdAt", "UpdatedAt"] },
-    });
-
-    res.status(200).send({
-      status: true,
-      message: "Pet Matched",
-      data
-    });
+    res.status(200).send(data);
   } catch (err) {
     console.log(err);
   }

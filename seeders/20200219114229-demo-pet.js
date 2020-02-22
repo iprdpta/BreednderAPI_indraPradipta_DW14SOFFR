@@ -32,7 +32,7 @@ module.exports = {
           gender: "Male",
           about_pet:"I'm Batman",
           photo:"https://i.pinimg.com/originals/35/3d/2b/353d2bfcd7a698b3b32bc75ccfcd4cfc.jpg",
-          species_id: 5,
+          species_id: 3,
           age_id:3,
           user_id:3,
           createdAt: new Date(),
