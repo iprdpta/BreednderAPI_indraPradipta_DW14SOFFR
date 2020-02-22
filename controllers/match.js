@@ -1,5 +1,9 @@
 const models = require("../models");
-const { checkMatch, checkAlreadyLiked, checkMatchx } = require("../middleware/match");
+const {
+  checkMatch,
+  checkAlreadyLiked,
+  checkMatchx
+} = require("../middleware/match");
 
 const Pet = models.pet;
 const User = models.user;
@@ -7,18 +11,25 @@ const Species = models.species;
 const Age = models.age;
 const Match = models.match;
 
-
 exports.check = async (req, res) => {
   try {
     const { pet_id, pet_id_liked } = req.query;
     const isMatch = await checkMatch(pet_id, pet_id_liked);
+    const isMatchx = await checkMatchx(pet_id, pet_id_liked);
     if (isMatch.length > 0) {
       const data = await Match.findOne({
         where: { pet_id: isMatch[0], pet_id_liked: isMatch[1] }
       });
       res.status(200).send(data);
     } else {
-      res.send("Match Not Found");
+      if (isMatchx.length > 0) {
+        const data = await Match.findOne({
+          where: { pet_id: isMatchx[0], pet_id_liked: isMatchx[1] }
+        });
+        res.status(200).send(data);
+      } else {
+        res.send({ message: "Match Not Found" });
+      }
     }
   } catch (err) {}
 };
@@ -29,7 +40,7 @@ exports.create = async (req, res) => {
     const isMatch = await checkMatchx(pet_id, pet_id_liked);
     if (isMatch.length > 0) {
       const isAlreadyLiked = await checkAlreadyLiked(pet_id, pet_id_liked);
-      res.send("Already Matched");
+      res.send({ message: "Already Matched" });
     } else {
       const isAlreadyLiked = await checkAlreadyLiked(pet_id, pet_id_liked);
       if (isAlreadyLiked) {
@@ -67,7 +78,7 @@ exports.create = async (req, res) => {
           });
           res.status(200).send(data);
         }
-        res.send("");
+        res.send({ message: "You Already Liked" });
       }
     }
   } catch (err) {

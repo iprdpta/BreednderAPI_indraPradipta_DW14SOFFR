@@ -17,7 +17,7 @@ exports.addSpecies = async (req, res) => {
       const check = await Species.findOne({ 
         attributes: 
         { exclude: ["createdAt", "updatedAt"] }, where: { name } });
-      res.send({ check });
+      res.send({ data: check });
     }
   } catch(err) {
     console.log(err);
@@ -38,7 +38,8 @@ exports.getSpecies = async (req, res) => {
 
   exports.showAllSpecies= async (req, res) => {
     try {
-      const species = await Species.findAll();
+      const species = await Species.findAll({attributes: 
+        { exclude: ["createdAt", "updatedAt"] }});
       res.send(species);
     } catch (err) {
       console.log(err);

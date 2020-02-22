@@ -8,19 +8,24 @@ exports.addPayment = async (req, res) => {
 
   const token = req.header("Authorization").replace("Bearer ", "");
   const user = jwt.verify(token, process.env.SECRET_KEY);
+  const level = await User.findOne({ where: { id: user.user_id } });
 
   try {
-    const payment = await Payment.create({
-      no_rek,
-      proof_of_transfer,
-      users_id: user.user_id,
-      status
-    });
-    res.status(200).send({
-      status: true,
-      message: "Success to Created Payment",
-      data: payment
-    });
+    if (user && level.level > 0) {
+      res.send({message: "You're an Admin, Can't Process the Payment"})
+    } else {
+      const payment = await Payment.create({
+        no_rek,
+        proof_of_transfer,
+        users_id: user.user_id,
+        status
+      });
+      res.status(200).send({
+        status: true,
+        message: "Success to Created Payment",
+        data: payment
+      });
+    }
   } catch (err) {
     console.log(err);
   }
@@ -33,10 +38,13 @@ exports.updatePayment = async (req, res) => {
   try {
     const token = req.header("Authorization").replace("Bearer ", "");
     const user = jwt.verify(token, process.env.SECRET_KEY);
-    const level = await User.findOne({ where: { id : user.user_id}})
+    const level = await User.findOne({ where: { id: user.user_id } });
 
-    if (user && level.level > 0 ) {
-      const payment = await Payment.update( {no_rek, proof_of_transfer, status} ,{ where: { id : id } });
+    if (user && level.level > 0) {
+      const payment = await Payment.update(
+        { no_rek, proof_of_transfer, status },
+        { where: { id: id } }
+      );
       const payment_detail = await Payment.findOne({
         include: [
           {
@@ -53,14 +61,13 @@ exports.updatePayment = async (req, res) => {
           }
         ],
         attributes: { exclude: ["user"] },
-        where: { id : id }
+        where: { id: id }
       });
       res.status(200).send({
         status: true,
         message: "Success to Updated Payment",
         data: payment_detail
       });
-      
     } else {
       res.status(200).send({
         status: false,

@@ -5,6 +5,7 @@ const Pet = models.pet;
 const User = models.user;
 const Species = models.species;
 const Age = models.age;
+const Payment = models.payment;
 
 exports.addPet = async (req, res) => {
   const { name, gender, age, about_pet, photo } = req.body;
@@ -14,44 +15,52 @@ exports.addPet = async (req, res) => {
   const token = req.header("Authorization").replace("Bearer ", "");
   const user = jwt.verify(token, process.env.SECRET_KEY);
 
+  const payment = await Payment.findOne({ where: { users_id: user.user_id } });
+
   const ageid = ages.id;
   try {
-    const pet = await Pet.create({
-      name,
-      gender,
-      species_id: species,
-      age_id: ageid,
-      user_id: user.user_id,
-      about_pet,
-      photo
-    });
-    const id = pet.id;
-    const data = await Pet.findOne({
-      include: [
-        {
-          model: User,
-          as: "user",
-          attributes: ["id", "breeder", "address", "phone"]
+    if (payment.status === "Premium") {
+      const pet = await Pet.create({
+        name,
+        gender,
+        species_id: species,
+        age_id: ageid,
+        user_id: user.user_id,
+        about_pet,
+        photo
+      });
+      const id = pet.id;
+      const data = await Pet.findOne({
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "breeder", "address", "phone"]
+          },
+          {
+            model: Species,
+            as: "species",
+            attributes: ["id", "name"]
+          },
+          {
+            model: Age,
+            as: "age",
+            attributes: ["id", "name"]
+          }
+        ],
+        attributes: {
+          exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"]
         },
-        {
-          model: Species,
-          as: "species",
-          attributes: ["id", "name"]
-        },
-        {
-          model: Age,
-          as: "age",
-          attributes: ["id", "name"]
-        }
-      ],
-      attributes: { exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"] },
-      where: { id }
-    });
-    res.status(200).send({
-      status: true,
-      message: "Success Add Your pet",
-      data
-    });
+        where: { id }
+      });
+      res.status(200).send({
+        status: true,
+        message: "Success Add Your pet",
+        data
+      });
+    } else {
+      res.send({ message: "You're not a Premium User"})
+    }
   } catch (err) {
     console.log(err);
   }
@@ -96,7 +105,7 @@ exports.updatePet = async (req, res) => {
         name,
         gender,
         species,
-        age_id : ageid,
+        age_id: ageid,
         about_pet,
         photo
       },
@@ -116,7 +125,9 @@ exports.updatePet = async (req, res) => {
           attributes: ["id", "name"]
         }
       ],
-      attributes: { exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"] } ,
+      attributes: {
+        exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"]
+      },
       where: { id }
     });
     res.status(200).send({
@@ -135,7 +146,7 @@ exports.deletePet = async (req, res) => {
     const petx = await Pet.findOne({ where: { id } });
     const pet = await Pet.destroy({ where: { id } });
     const idpet = petx.name;
-    res.status(200).send({ message: `Your Pet ${idpet} Has Been Deleted`});
+    res.status(200).send({ message: `Your Pet ${idpet} Has Been Deleted` });
     console.log(err);
   } catch (err) {
     console.log(err);
@@ -158,12 +169,14 @@ exports.detailPet = async (req, res) => {
           attributes: ["id", "breeder", "address", "phone"]
         }
       ],
-      attributes: { exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"] } ,
+      attributes: {
+        exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"]
+      },
       where: { id }
     });
 
     const idpet = detail.name;
-    res.status(200).send({ message: `Your Pet ${idpet}`, Detail : detail });
+    res.status(200).send({ message: `Your Pet ${idpet}`, Detail: detail });
     console.log(err);
   } catch (err) {
     console.log(err);

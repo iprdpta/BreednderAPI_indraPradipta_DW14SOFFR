@@ -8,7 +8,7 @@ exports.detailUser = async (req, res) => {
     const detail = await User.findOne({ where: { id } });
 
     const name = detail.breeder;
-    res.status(200).send({ message: `Your Pet ${name}`, Detail: detail });
+    res.status(200).send({ message: `Account Detail ${name}`, Detail: detail });
     console.log(err);
   } catch (err) {
     console.log(err);
@@ -52,7 +52,7 @@ exports.deleteUser = async (req, res) => {
 
       const pet = await Pet.findAll ({ where: {user_id : id}})
       const deletepet = await Pet.destroy({ where: {user_id : id}})
-      res.status(200).send({ message: `Your Account ${iduser} Has Been Deleted`, pet});
+      res.status(200).send({ message: `Your Account ${iduser} Has Been Deleted`, usx , pet});
       console.log(err);
     } catch (err) {
       console.log(err);

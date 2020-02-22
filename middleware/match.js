@@ -8,7 +8,7 @@ exports.checkMatch = async (pet_id, pet_id_liked) => {
       where: {
         pet_id,
         pet_id_liked,
-        status: true
+        status: "true"
       }
     });
     if (isMatch) {
@@ -18,7 +18,7 @@ exports.checkMatch = async (pet_id, pet_id_liked) => {
         where: {
           pet_id: pet_id_liked,
           pet_id_liked: pet_id,
-          status: true
+          status: "true"
         }
       });
       if (isMatch) {
