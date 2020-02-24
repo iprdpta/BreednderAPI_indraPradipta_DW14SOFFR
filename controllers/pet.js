@@ -16,50 +16,63 @@ exports.addPet = async (req, res) => {
   const user = jwt.verify(token, process.env.SECRET_KEY);
 
   const payment = await Payment.findOne({ where: { users_id: user.user_id } });
-
   const ageid = ages.id;
+
   try {
-    if (payment.status === "Premium") {
-      const pet = await Pet.create({
-        name,
-        gender,
-        species_id: species,
-        age_id: ageid,
-        user_id: user.user_id,
-        about_pet,
-        photo
-      });
-      const id = pet.id;
-      const data = await Pet.findOne({
-        include: [
-          {
-            model: User,
-            as: "user",
-            attributes: ["id", "breeder", "address", "phone"]
-          },
-          {
-            model: Species,
-            as: "species",
-            attributes: ["id", "name"]
-          },
-          {
-            model: Age,
-            as: "age",
-            attributes: ["id", "name"]
-          }
-        ],
-        attributes: {
-          exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"]
-        },
-        where: { id }
-      });
-      res.status(200).send({
-        status: true,
-        message: "Success Add Your pet",
-        data
-      });
+    if (payment === null) {
+      res.send({ message: "You need to be Premium User to use this feature, Please add your Payment first" });
     } else {
-      res.send({ message: "You're not a Premium User"})
+      if (payment.status === "Premium") {
+        const pet = await Pet.create({
+          name,
+          gender,
+          species_id: species,
+          age_id: ageid,
+          user_id: user.user_id,
+          about_pet,
+          photo
+        });
+        const id = pet.id;
+        const data = await Pet.findOne({
+          include: [
+            {
+              model: User,
+              as: "user",
+              attributes: ["id", "breeder", "address", "phone"]
+            },
+            {
+              model: Species,
+              as: "species",
+              attributes: ["id", "name"]
+            },
+            {
+              model: Age,
+              as: "age",
+              attributes: ["id", "name"]
+            }
+          ],
+          attributes: {
+            exclude: [
+              "user_id",
+              "species_id",
+              "age_id",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          where: { id }
+        });
+        res.status(200).send({
+          status: true,
+          message: "Success Add Your pet",
+          data
+        });
+      } else {
+        res.send({
+          message:
+            "Your Payment need to be Verified first, Please Wait until your payment has verified..."
+        });
+      }
     }
   } catch (err) {
     console.log(err);

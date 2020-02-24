@@ -4,27 +4,34 @@ const Payment = models.payment;
 const User = models.user;
 
 exports.addPayment = async (req, res) => {
-  const { no_rek, proof_of_transfer, status } = req.body;
+  const { no_rek, proof_of_transfer } = req.body;
 
   const token = req.header("Authorization").replace("Bearer ", "");
   const user = jwt.verify(token, process.env.SECRET_KEY);
   const level = await User.findOne({ where: { id: user.user_id } });
 
+  const check = await Payment.findOne({where : { users_id : user.user_id}});
+
   try {
     if (user && level.level > 0) {
       res.send({message: "You're an Admin, Can't Process the Payment"})
     } else {
-      const payment = await Payment.create({
-        no_rek,
-        proof_of_transfer,
-        users_id: user.user_id,
-        status
-      });
-      res.status(200).send({
-        status: true,
-        message: "Success to Created Payment",
-        data: payment
-      });
+      if(!check){
+        const payment = await Payment.create({
+          no_rek,
+          proof_of_transfer,
+          users_id: user.user_id,
+          status : "Free"
+        });
+        res.status(200).send({
+          status: true,
+          message: "Success to Created Payment",
+          data: payment
+        });
+
+      } else{
+        res.send({ message: "You already add a payment, please wait until your payment has verified"})
+      }
     }
   } catch (err) {
     console.log(err);
