@@ -43,6 +43,8 @@ exports.create = async (req, res) => {
 
   const x = await Pet.findOne({ where: { id: pet_id, user_id: user.user_id } });
 
+  console.log(`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ${isMatch}`)
+
   try {
     if (x) {
       if (isMatch.length > 0) {

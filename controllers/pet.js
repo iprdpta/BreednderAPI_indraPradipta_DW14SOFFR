@@ -20,7 +20,10 @@ exports.addPet = async (req, res) => {
 
   try {
     if (payment === null) {
-      res.send({ message: "You need to be Premium User to use this feature, Please add your Payment first" });
+      res.send({
+        message:
+          "You need to be Premium User to use this feature, Please add your Payment first"
+      });
     } else {
       if (payment.status === "Premium") {
         const pet = await Pet.create({
@@ -107,60 +110,86 @@ exports.updatePet = async (req, res) => {
   const { name, gender, age, about_pet, photo } = req.body;
   const species = req.body.spesies;
 
+  const token = req.header("Authorization").replace("Bearer ", "");
+  const user = jwt.verify(token, process.env.SECRET_KEY);
+
   const ages = await Age.findOne({ where: { name: age } });
 
   const ageid = ages.id;
 
+  const check = await Pet.findOne({
+    where: { id: id_data, user_id: user.user_id }
+  });
+
   try {
-    //console.log(req.user);
-    const pet = await Pet.update(
-      {
-        name,
-        gender,
-        species,
-        age_id: ageid,
-        about_pet,
-        photo
-      },
-      { where: { id: id_data } }
-    );
-    const id = req.params.id;
-    const data = await Pet.findOne({
-      include: [
+    if (!check) {
+      res.send({ message: "Yot're not the owner of this pet" });
+    } else {
+      const pet = await Pet.update(
         {
-          model: User,
-          as: "user",
-          attributes: ["id", "breeder", "address", "phone"]
+          name,
+          gender,
+          species,
+          age_id: ageid,
+          about_pet,
+          photo
         },
-        {
-          model: Species,
-          as: "species",
-          attributes: ["id", "name"]
-        }
-      ],
-      attributes: {
-        exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"]
-      },
-      where: { id }
-    });
-    res.status(200).send({
-      status: true,
-      message: "Success Update your pet",
-      data: data
-    });
+        { where: { id: id_data } }
+      );
+      const id = req.params.id;
+      const data = await Pet.findOne({
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "breeder", "address", "phone"]
+          },
+          {
+            model: Age,
+            as: "age",
+            attributes: ["id", "name"]
+          },
+          {
+            model: Species,
+            as: "species",
+            attributes: ["id", "name"]
+          }
+        ],
+        attributes: {
+          exclude: ["user_id", "species_id", "age_id", "createdAt", "updatedAt"]
+        },
+        where: { id }
+      });
+      res.status(200).send({
+        status: true,
+        message: "Success Update your pet",
+        data: data
+      });
+    }
   } catch (err) {
     console.log(err);
   }
 };
 
 exports.deletePet = async (req, res) => {
+  const id_data = req.params.id;
+  const token = req.header("Authorization").replace("Bearer ", "");
+  const user = jwt.verify(token, process.env.SECRET_KEY);
+
+  const check = await Pet.findOne({
+    where: { id: id_data, user_id: user.user_id }
+  });
   try {
-    const { id } = req.params;
-    const petx = await Pet.findOne({ where: { id } });
-    const pet = await Pet.destroy({ where: { id } });
-    const idpet = petx.name;
-    res.status(200).send({ message: `Your Pet ${idpet} Has Been Deleted` });
-    console.log(err);
+    if (!check) {
+      res.send({ message: "Yot're not the owner of this pet" });
+    } else {
+      const { id } = req.params;
+      const petx = await Pet.findOne({ where: { id } });
+      const pet = await Pet.destroy({ where: { id } });
+      const idpet = petx.name;
+      res.status(200).send({ message: `Your Pet ${idpet} Has Been Deleted` });
+      console.log(err);
+    }
   } catch (err) {
     console.log(err);
   }
@@ -189,7 +218,7 @@ exports.detailPet = async (req, res) => {
     });
 
     const idpet = detail.name;
-    res.status(200).send({ message: `Your Pet ${idpet}`, Detail: detail });
+    res.status(200).send({ message: `Pet Name ${idpet}`, Detail: detail });
     console.log(err);
   } catch (err) {
     console.log(err);
