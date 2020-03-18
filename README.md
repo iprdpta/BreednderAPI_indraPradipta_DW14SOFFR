@@ -1,5 +1,19 @@
 # PetMatch API
 
+### Installation
+
+First, clone this repository into your system.
+
+```
+git clone https://github.com/iprdpta/BreednderAPI_indraPradipta_DW14SOFFR.git
+```
+
+Then, install all the packages that described in `package.json` of both `client` and `server` directories.
+
+```
+npm install
+```
+
 ### Server Setup
 
 For the server setup, first, make sure your MySQL services is running fine. In `server` directory, you'll find `config.json` inside `config` folder. Open and edit the `development` configuration to match your database setup.
